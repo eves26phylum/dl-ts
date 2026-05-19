@@ -1,0 +1,16 @@
+{
+  "name": "@eves26phylum/types",
+  "version": "1.0.3",
+  "publishConfig": {
+		"access": "public"
+	},
+  "description": "Deadline's Types",
+  "license": "Apache-2.0",
+  "author": "eves26phylum",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "main": "global.d.ts",
+	"types": "global.d.ts"
+}
