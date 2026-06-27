@@ -186,7 +186,7 @@ type WrappedInstance<T extends Instance = Instance> = {
     is_a: <C extends keyof Instances>(childName: C) => this is WrappedInstance<Instances[C]>;
     is_descendant_of: (instance: WrappedInstance) => boolean;
 
-} & StripRobloxBrands<InstanceProperties<T>>
+} & Pick<StripRobloxBrands<InstanceProperties<T>>, Exclude<keyof StripRobloxBrands<InstanceProperties<T>>, 'Parent'>>
 
 /**
  * Result of tags.get_tagged / tags.get_all_tagged.
