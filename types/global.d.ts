@@ -114,6 +114,7 @@ declare const Signal: {
     new<T extends (...args: any[]) => void = (...args: any[]) => void>(): SignalInstance<T>;
 };
 
+type ExcludeInstanceKeys<T> = Pick<T, Exclude<keyof T, keyof Instance>>
 
 // ================================================================
 // INSTANCE SYSTEM  [SHARED]
@@ -187,6 +188,7 @@ type WrappedInstance<T extends Instance = Instance> = {
     is_descendant_of: (instance: WrappedInstance) => boolean;
 
 } & Pick<StripRobloxBrands<InstanceProperties<T>>, Exclude<keyof StripRobloxBrands<InstanceProperties<T>>, 'Parent'>>
+// remove default instance .Parent merging with main
 
 /**
  * Result of tags.get_tagged / tags.get_all_tagged.
@@ -379,15 +381,430 @@ declare namespace query {
  * (for…in) does not work. Use `sharedvars_descriptions` to enumerate keys.
  * Writes only take effect when executed on the server.
  */
+// Credit goes to speedyfox67 in the Deadline community
 declare const sharedvars: {
+    /** Whether staying in the air will kill you. */
+    ac_airtime_kill: boolean;
+    /** Whether movement anticheat is enabled. */
+    ac_movement: boolean;
+    /** Timeout before invalidating a shot. */
+    ac_shot_timeout: number;
+    /** @internal */
+    ac_sound_kill: boolean;
+    /** Whether analytics are enabled. */
+    api_analytics_enabled: boolean;
+    /** Game-wide announcement. */
+    api_announcement: string;
+    /** Whether the server will handle messages from deadlinegame.com. */
+    api_messaging_enabled: boolean;
+    /** Newest server version. */
+    api_newest_server_version: string;
+    /** Game update message shown to returning players. */
+    api_update_message: string;
+    /** How close a bot has to be to its target to consider it reached. */
+    bot_target_reach_distance: number;
+    /** Whether chat announces server changes. */
+    chat_announce_changes: boolean;
+    /** Whether chat is disabled. */
+    chat_disable: boolean;
+    /** Maximum chat history. */
+    chat_max_history: number;
+    /** How often chat tips are shown. */
+    chat_tip_frequency: number;
     /** Toggles chat tips for all players. [SERVER] */
     chat_tips_enabled: boolean;
-    /** Adds an offset in hours to the in-game clock. */
-    sv_time_offset: number;
-    /** When false, players are blocked from spawning. [SERVER] */
-    sv_spawning_enabled: boolean;
+    /** Whether the server is shutting down. */
+    crit_shutdown: boolean;
+    /** Whether backblast debug is active. */
+    dbg_backblast: boolean;
+    /** Whether bot pathfinding lines are enabled. */
+    dbg_bot_pathfind_lines: boolean;
+    /** Whether Canim animator debug is enabled. */
+    dbg_canim: boolean;
+    /** Whether additional error info exists. */
+    dbg_catch_errors: boolean;
+    /** Whether character controller gizmos are enabled. */
+    dbg_char_gizmos: boolean;
+    /** Whether thread yielding checks are enabled. */
+    dbg_check_for_thread_yielding: boolean;
+    /** Whether to show node offset debug UI in builder. */
+    dbg_debug_node_offsets: boolean;
+    /** Whether lighting will update according to lighting preset and time. */
+    dbg_disable_weather: boolean;
+    /** Debugger in the editor. */
+    dbg_editor_debugger: boolean;
+    /** Whether stats previews are disabled in the editor. */
+    dbg_editor_disable_stat_previews: boolean;
+    /** Enables the recommended attachment system in the editor. */
+    dbg_enable_editor_recommended: boolean;
+    /** Whether RemoteEvent profiling is enabled. */
+    dbg_event_profiling: boolean;
+    /** Hold to interact time for magchecking and firemode checking. */
+    dbg_game_hold_to_interact_time: number;
+    /** Whether fps is limited to dbg_max_fps. */
+    dbg_limit_fps: boolean;
+    /** Logservice screen output. */
+    dbg_logservice: boolean;
+    /** Enables customizing the ammo positions in the editor. */
+    dbg_mag_stack: boolean;
+    /** Max fps limit while dbg_limit_fps is enabled. */
+    dbg_max_fps: number;
+    /** Debugger for aimmarker positioning error. */
+    dbg_optics: boolean;
+    /** Whether to regen weapon offsets at runtime. */
+    dbg_position_runtime_regen: boolean;
+    /** Delay after dying before death screen. */
+    dbg_post_death_delay: number;
+    /** Whether rigging mode is enabled. */
+    dbg_prepare_for_rig: boolean;
+    /** Whether microprofiler tags are enabled. */
+    dbg_profiling: boolean;
+    /** Projectile gizmos. */
+    dbg_projectile: boolean;
+    /** Enables customizing any weapon recoil patterns in the F10 menu. */
+    dbg_recoil: boolean;
+    /** Whether shell extraction location is shown. */
+    dbg_show_shell_location: boolean;
+    /** Whether to show raycast shot trajectory. */
+    dbg_show_shot_trajectory: boolean;
+    /** Spawn transition time. */
+    dbg_spawn_transition_time: number;
+    /** Whether to log rodux store changes. */
+    dbg_store_changes: boolean;
+    /** Whether the gunshot emitter test mode is enabled. Only works while joining. */
+    dbg_test_gunshot_emitter: boolean;
+    /** Whether vaulting debug is enabled. */
+    dbg_vault_lines: boolean;
+    /** Whether warpzone debug is enabled. */
+    dbg_warpzones: boolean;
+    /** Whether compatibility check limits are enabled. */
+    editor_compatibility_checks: boolean;
+    /** Editor hover distance. */
+    editor_hover_distance: number;
+    /** Whether you can mount any attachment in any attachment slot. Allows for very scuffed gun builds. */
+    editor_mount_anything: boolean;
+    /** Whether attachment streaming on-demand is enabled. */
+    ff_attachment_streaming: boolean;
+    /** Enables voicelines when reloading, and throwing throwables */
+    ff_field_voicelines: boolean;
+    /** [READ-ONLY] Game branch. */
+    readonly game_branch: string;
+    /** [READ-ONLY] Game version. */
+    readonly game_version: string;
+    /** Whether loadout editing is disabled. */
+    gm_disable_loadout_editing: boolean;
+    /** How long a TDM match lasts in minutes. */
+    gm_match_time_minutes: number;
+    /** Whether objective markers are enabled. */
+    gm_objective_markers: boolean;
+    /** How many points to award per second in other gamemodes. */
+    gm_points_per_second: number;
+    /** Whether players are forced to spawn in push. */
+    gm_push_force_spawning: boolean;
+    /** How long to wait before spawning players in push. */
+    gm_push_spawn_timer: number;
+    /** Whether spawning is enabled in push. */
+    gm_push_spawning: boolean;
+    /** How long to wait before capturing a point in push. */
+    gm_push_time_to_capture: number;
+    /** How long to wait before refilling ammo with the refill interactable. */
+    gm_refill_interactable_cooldown_time: number;
+    /** Server replication frequency in hertz. */
+    gm_replication_frequency_hz: number;
+    /** Server replication packet size for outgoing player data. */
+    gm_replication_packet_size_bytes_outgoing: number;
+    /** The amount of players a team can be unbalanced by before team switching isn't allowed. */
+    gm_team_balancing_threshold: number;
+    /** Whether team scrambling is enabled when a match starts. */
+    gm_team_scrambling: boolean;
+    /** How long to wait before capturing a point in other gamemodes. */
+    gm_time_to_capture: number;
+    /** [READ-ONLY] Whether the server is a VIP server. */
+    readonly is_vip_server: boolean;
+    /** [READ-ONLY] Place configuration. Decides whether the server runs as the lobby or main game. */
+    readonly place_config: string;
+    /** Whether aiming in bushes is enabled. */
+    plr_aim_in_bushes: boolean;
+    /** Whether the magcheck UI is always shown. */
+    plr_always_show_magcheck: boolean;
+    /** Player arm stamina drain. */
+    plr_arm_stamina_drain: number;
+    /** Player arm stamina drain while holding breath. */
+    plr_arm_stamina_drain_hold_breath: number;
+    /** Player arm stamina regen speed. */
+    plr_arm_stamina_regen: number;
+    /** Player arm stamina regen speed while crouching. */
+    plr_arm_stamina_regen_crouch: number;
+    /** Whether auto jump is enabled. */
+    plr_auto_jump: boolean;
+    /** Player barrel deviation. */
+    plr_barrel_deviation: number;
+    /** Player base weight. */
+    plr_base_weight: number;
+    /** Player buck barrel deviation. */
+    plr_buck_barrel_deviation: number;
+    /** Debounce before you can cancel a reload again. */
+    plr_cancel_reload_timeout: number;
+    /** Whether ceasefire is enabled. */
+    plr_ceasefire: boolean;
+    /** Player damage multiplier. */
+    plr_damage_multiplier: number;
+    /** Whether shot location is shown in death view. */
+    plr_death_view_shot_location: boolean;
+    /** Default camera mode. Values include Default, Freecam, TPerson. */
+    plr_default_camera_mode: string;
+    /** Default NVG DOF focus distance. */
+    plr_default_nvg_dof_distance: number;
+    /** Whether explosive projectile arming is disabled, meaning they will explode upon contact immediately. */
+    plr_disable_arming: boolean;
+    /** Whether NVG is disabled. */
+    plr_disable_nvg: boolean;
+    /** Whether RPG ammo refills are disabled. */
+    plr_disable_rpg_refill: boolean;
+    /** How long it takes to drown. */
+    plr_drown_time: number;
+    /** Drum magazines available when spawning for drums. */
+    plr_drum_magazines: number;
+    /** Whether one hand aiming is enabled. When enabled, the default keybind is I. */
+    plr_enable_gangsta_control: boolean;
+    /** Whether leaderboard markers are enabled. */
+    plr_enable_leaderboard_points: boolean;
+    /** Whether markers are enabled. */
+    plr_enable_markers: boolean;
+    /** Whether mounting is enabled. */
+    plr_enable_mounting: boolean;
+    /** Player ergonomics multiplier. */
+    plr_ergonomics_multiplier: number;
+    /** Player explosion blast pressure. */
+    plr_explosion_blast_pressure: number;
+    /** Player explosion damage multiplier. */
+    plr_explosion_damage_multiplier: number;
+    /** Whether fall damage is enabled. */
+    plr_fall_damage: boolean;
+    /** Camera FOV while in freecam. */
+    plr_freecam_fov: number;
+    /** Player grenade throw strength. */
+    plr_grenade_throw_strength: number;
+    /** Player headshot damage multiplier. */
+    plr_headshot_damage_multiplier: number;
+    /** Player health regen speed. */
+    plr_health_regen_sec: number;
+    /** Player hip height. */
+    plr_hipheight: number;
+    /** Player initial health. */
+    plr_initial_health: number;
+    /** How much time the player has after spawning to reset to the lobby instantly. */
+    plr_instant_lobby_return_time: number;
+    /** Whether you can switch directions while in the air. */
+    plr_jump_control_momentum: boolean;
+    /** Player jump frequency in hz. */
+    plr_jump_frequency: number;
+    /** Player jump multiplier. */
+    plr_jump_multiplier: number;
+    /** Player jump recovery time in seconds. */
+    plr_jump_recovery: number;
+    /** Player laser max directional distance. */
+    plr_laser_max_directional_distance: number;
+    /** Whether lens flare is enabled. */
+    plr_lens_flare: boolean;
+    /** How long to wait before hiding magazine stats. */
+    plr_mag_stats_timeout: number;
+    /** Magazines available when spawning for non-drum weapons. */
+    plr_magazines: number;
+    /** Player max arm stamina. */
+    plr_max_arm_stamina: number;
+    /** Player max directional distance. */
+    plr_max_directional_distance: number;
+    /** Player max object interaction distance. */
+    plr_max_interaction_distance: number;
+    /** Player max stamina. */
+    plr_max_stamina: number;
+    /** Player model. Values include main, orchids_pbr_set, orchids_shark_set. */
+    plr_model: string;
+    /** Whether momentum is enabled. */
+    plr_momentum: boolean;
+    /** Player movement smoothing. */
+    plr_movement_damping: number;
+    /** Player movement stiffness at maximum weight. */
+    plr_movement_max_stiffness: number;
+    /** Player movement stiffness at minimum weight. */
+    plr_movement_min_stiffness: number;
+    /** Color player NVG. */
+    plr_nv_color: Color3;
+    /** Projectile penetration multiplier. */
+    plr_penetration_multiplier: number;
+    /** Maximum allowed player ping. */
+    plr_ping_limit_sec: number;
+    /** How long the ping has to be over plr_ping_limit_sec for the client to get kicked. */
+    plr_ping_timeout_sec: number;
+    /** Ping warning threshold in milliseconds. */
+    plr_ping_warning_threshold_ms: number;
+    /** Whether PVP is enabled. */
+    plr_pvp: boolean;
+    /** Player ragdoll throw strength. */
+    plr_ragdoll_strength: number;
+    /** Global recoil multiplier. */
+    plr_recoil: number;
+    /** Player replication frequency in hz. */
+    plr_replication_frequency_hz: number;
+    /** Player replication rollback time in milliseconds. */
+    plr_replication_rollback_time_ms: number;
+    /** Delay before the player dies after resetting. */
+    plr_reset_delay: number;
+    /** Player shove bayonet distance. */
+    plr_shove_bayonet_distance: number;
+    /** Player shove bayonet headshot damage. */
+    plr_shove_bayonet_headshot_damage: number;
+    /** Player shove bayonet limb damage. */
+    plr_shove_bayonet_limb_damage: number;
+    /** Player shove bayonet torso damage. */
+    plr_shove_bayonet_torso_damage: number;
+    /** Player shove distance. */
+    plr_shove_distance: number;
+    /** Player shove headshot damage. */
+    plr_shove_headshot_damage: number;
+    /** Player shove limb damage. */
+    plr_shove_limb_damage: number;
+    /** Player shove melee headshot damage. */
+    plr_shove_melee_headshot_damage: number;
+    /** Player shove melee limb damage. */
+    plr_shove_melee_limb_damage: number;
+    /** Player shove melee torso damage. */
+    plr_shove_melee_torso_damage: number;
+    /** Player shove torso damage. */
+    plr_shove_torso_damage: number;
+    /** Whether the magcheck UI shows exact ammo. */
+    plr_show_exact_magcheck_ammo: boolean;
+    /** Spare rounds for single-shot weapons. */
+    plr_single_shot_spare_rounds: number;
+    /** Spare rounds for internal-magazine weapons. */
+    plr_spare_rounds: number;
+    /** Player speed multiplier. */
+    plr_speed: number;
+    /** Player stamina regen speed while crouching. */
+    plr_stamina_crouch_regen: number;
+    /** Player stamina jump drain. */
+    plr_stamina_jump_drain: number;
+    /** Player stamina lean drain. */
+    plr_stamina_lean_drain: number;
+    /** Player stamina regen speed. */
+    plr_stamina_regen: number;
+    /** Player stamina run drain. */
+    plr_stamina_run_drain: number;
+    /** Player stamina shake multiplier. */
+    plr_stamina_shake_multiplier: number;
+    /** Whether suppression is enabled. */
+    plr_suppression: boolean;
+    /** Player swift switch speed multiplier. */
+    plr_swift_switch_speed_multiplier: number;
+    /** Whether team killing is enabled. */
+    plr_team_kill: boolean;
+    /** Player vault barrier detection raycast multiplier. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_barrier_detection_raycast_multiplier: number;
+    /** Player vault barrier distance addition. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_barrier_distance_addition: number;
+    /** Player vault barrier height reduction. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_barrier_height_reduction: number;
+    /** Player vault barrier initial delay multiplier. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_barrier_initial_delay_multiplier: number;
+    /** Player vault barrier move time multiplier. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_barrier_move_time_multiplier: number;
+    /** Player vault barrier throw multiplier. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_barrier_throw_multiplier: number;
+    /** Player vault frontal detection length. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_frontal_detection_length: number;
+    /** Player vault frontal size x. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_frontal_size_x: number;
+    /** Player vault frontal size y. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_frontal_size_y: number;
+    /** Player vault height. */
+    plr_vault_height: number;
+    /** Player vault inward offset. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_inward_offset: number;
+    /** Player vault max delay before starting animation. */
+    plr_vault_max_delay: number;
+    /** Player vault max vault animation time. */
+    plr_vault_max_vault_time: number;
+    /** Player vault minimum delay before starting animation. */
+    plr_vault_min_delay: number;
+    /** Player vault minimum vault animation time. */
+    plr_vault_min_vault_time: number;
+    /** Player vault rotation limit. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_rotation_limit: number;
+    /** Player stamina drain while vaulting. */
+    plr_vault_stamina_drain: number;
+    /** Player vault top check max hits. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_top_check_max_hits: number;
+    /** Player vault top check raycast count. Set dbg_vault_lines to true before playing with these values! */
+    plr_vault_top_check_raycast_count: number;
+    /** Player vault top detection length. */
+    plr_vault_top_detection_length: number;
+    /** Player viewmodel state transition speed multiplier. */
+    plr_viewmodel_state_transition_speed: number;
     /** When false, weapon stat clamping is disabled for all players. */
     plr_weapon_clamp_stats_values: boolean;
+    /** Whether progression related buying features and limits are enabled. */
+    ro_earnings_enabled: boolean;
+    /** Whether Staging branch players get money. */
+    ro_infinite_money_in_staging: boolean;
+    /** Server join message. Set with chat.set_join_message(message). */
+    ro_join_message: string;
+    /** Whether players without chat roles are kicked from the game. */
+    ro_kick_non_roled_players: boolean;
+    /** Whether money functions are enabled. */
+    ro_luau_give_money_enabled: boolean;
+    /** Whether the Luau mod console environment was loaded. */
+    ro_server_console_loaded: boolean;
+    /** Reason why spawning is disabled. Set with (set-spawning-disabled-reason reason). */
+    ro_spawning_disabled_reason: string;
+    /** Whether bots spawn on their own. */
+    sv_bot_auto_spawning_enabled: boolean;
+    /** Server creation time. */
+    sv_creation_time: number;
+    /** Server day cycle speed in seconds. A value of 1 is 1:1 to real life. */
+    sv_day_cycle_speed: number;
+    /** Server gravity. Mapped to workspace.Gravity. */
+    sv_gravity: number;
+    /** Whether moderator tag in chat is disabled. */
+    sv_hide_mod_tag: boolean;
+    /** When the match intermission ends, or undefined if there is none. */
+    sv_intermission_finish: number | undefined;
+    /** Whether the gun editor is only enabled during intermission. */
+    sv_intermission_only_editor: boolean;
+    /** Whether only preload list attachments are loaded. */
+    sv_load_only_preloaded_attachments: boolean;
+    /** Geographical server location. */
+    sv_location: string;
+    /** How long the intermission between matches lasts. */
+    sv_map_intermission_time: number;
+    /** How long map voting lasts. */
+    sv_map_vote_time: number;
+    /** Whether map voting is enabled. */
+    sv_map_voting: boolean;
+    /** Whether modfiles are enabled. */
+    sv_modfiles_enabled: boolean;
+    /** Whether tracers have random colors. */
+    sv_rainbow_tracers: boolean;
+    /** Whether the server uses the map's defined preset when switching maps. */
+    sv_respect_preset_properties: boolean;
+    /** Whether set dressing events are enabled. Events include background audio or passing aircraft. */
+    sv_set_dressing_events_enabled: boolean;
+    /** How often set dressing events are triggered. */
+    sv_set_dressing_events_frequency_hz: number;
+    /** Server sound speed in studs. */
+    sv_sound_speed: number;
+    /** When false, players are blocked from spawning. [SERVER] */
+    sv_spawning_enabled: boolean;
+    /** Adds an offset in hours to the in-game clock. */
+    sv_time_offset: number;
+    /** Server timescale. 1 means realtime. Setting this to 0 will break the game. */
+    sv_timescale: number;
+    /** Tracer bullet size. */
+    sv_tracer_size: number;
+    /** Whether Volumika is enabled. */
+    sv_volumika: boolean;
+    /** [READ-ONLY] VIP server owner. */
+    readonly vip_owner: string;
     [key: string]: unknown;
 };
 
